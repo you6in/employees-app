@@ -2,7 +2,7 @@
   <div class="container">
     <div class="header">
       <h1 class="header__title">Dashboard</h1>
-      <button class="header__button">Add employee</button>
+      <button class="header__button">+ Add Employee</button>
     </div>
     <tabs></tabs>
     <div class="table">
@@ -134,5 +134,24 @@ body {
       text-align: center;
     }
   }
+}
+
+button {
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+  padding: 12px 16px;
+
+  &:hover {
+    box-shadow: 0 5px 10px 2px rgba(34, 60, 80, 0.2);
+  }
+}
+
+.header__button {
+  background-color: #00dc81;
 }
 </style>

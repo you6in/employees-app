@@ -98,6 +98,10 @@ export default defineComponent({
 
   &__actions {
     margin-left: auto;
+
+    button {
+      background-color: red;
+    }
   }
 
   &:hover {
