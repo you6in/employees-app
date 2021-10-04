@@ -4,7 +4,9 @@
       <h1 class="header__title">Dashboard</h1>
       <button class="header__button">+ Add Employee</button>
     </div>
-    <tabs></tabs>
+
+    <tabs :tabs="employeeTabs" @change-tab="changeTab" />
+
     <div class="table">
       <div class="table__header">
         <div class="info">Basic Info</div>
@@ -15,7 +17,7 @@
       </div>
       <div class="table__body">
         <employee-item
-          v-for="employee in localEmployees"
+          v-for="employee in filteredEmployees"
           :employee="employee"
           :key="employee.id"
         />
@@ -25,11 +27,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, Ref } from "vue";
+import { computed, defineComponent, onMounted, ref, Ref } from "vue";
 import employeeComposition from "@/compositions/employeeComposition";
 import Tabs from "./components/Tabs.vue";
 import EmployeeItem from "@/components/Employee.vue";
 import { Employee } from "@/types/employees";
+import { employeeTabs } from "@/config/employeeTabsConfig";
 
 export default defineComponent({
   name: "App",
@@ -39,11 +42,23 @@ export default defineComponent({
      * Data
      */
     const localEmployees: Ref<Employee[]> = ref([]);
+    const currentTab: Ref<string> = ref(employeeTabs.value[0]);
 
     /**
      * Compositions
      */
     const employeesManagement = employeeComposition();
+
+    /**
+     * Computed
+     */
+    const filteredEmployees: Readonly<Ref<Employee[]>> = computed(() =>
+      currentTab.value === "Employee List"
+        ? localEmployees.value
+        : localEmployees.value.filter(
+            ({ designation }) => designation === currentTab.value
+          )
+    );
 
     /**
      * Hooks
@@ -59,12 +74,16 @@ export default defineComponent({
       const data = await employeesManagement.getEmployees();
 
       localEmployees.value = data;
-
-      console.log(data);
     };
 
+    const changeTab: (tab: string) => void = (tab) => (currentTab.value = tab);
+
     return {
-      localEmployees,
+      employeeTabs,
+
+      filteredEmployees,
+
+      changeTab,
     };
   },
 });
@@ -89,7 +108,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 .tabs {
   margin-bottom: 50px;
