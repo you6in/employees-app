@@ -20,6 +20,7 @@
           v-for="employee in filteredEmployees"
           :employee="employee"
           :key="employee.id"
+          @remove="remove(employee.id)"
         />
       </div>
     </div>
@@ -76,6 +77,16 @@ export default defineComponent({
       localEmployees.value = data;
     };
 
+    const remove: (id: string) => void = async (id) => {
+      const candidate = await employeesManagement.removeEmployee(id);
+
+      if (!candidate || !candidate.id) return;
+
+      localEmployees.value = localEmployees.value.filter(
+        ({ id }) => id !== candidate.id
+      );
+    };
+
     const changeTab: (tab: string) => void = (tab) => (currentTab.value = tab);
 
     return {
@@ -83,6 +94,7 @@ export default defineComponent({
 
       filteredEmployees,
 
+      remove,
       changeTab,
     };
   },
@@ -103,6 +115,7 @@ body {
 .container {
   width: 1200px;
   margin: 0 auto;
+  padding: 20px 0;
 }
 .header {
   display: flex;

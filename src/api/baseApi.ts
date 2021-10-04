@@ -5,8 +5,14 @@ export default class BaseApi<T> {
     this.baseUrl = baseUrl;
   }
 
-  async getItems(url: string): Promise<T[]> {
-    const data = await fetch(`${this.baseUrl}/${url}`);
+  async getItems(): Promise<T[]> {
+    const data = await fetch(`${this.baseUrl}`);
+
+    return data.json();
+  }
+
+  async removeItem(id: string): Promise<T> {
+    const data = await fetch(`${this.baseUrl}/${id}`, { method: "DELETE" });
 
     return data.json();
   }

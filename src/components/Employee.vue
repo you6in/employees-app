@@ -13,7 +13,7 @@
     <div class="employee__join-date">
       {{ new Date(employee.joiningDate).toLocaleDateString() }}
     </div>
-    <div class="employee__actions"><button>remove</button></div>
+    <div class="employee__actions"><button @click="remove">remove</button></div>
   </div>
 </template>
 
@@ -28,6 +28,16 @@ export default defineComponent({
       type: Object as () => Employee,
       required: true,
     },
+  },
+  setup(_, vm) {
+    /**
+     * Methods
+     */
+    const remove: () => void = () => vm.emit("remove");
+
+    return {
+      remove,
+    };
   },
 });
 </script>
