@@ -15,15 +15,35 @@
         <div class="phone">Phone Number</div>
         <div class="joining-date">Joining Date</div>
       </div>
+
       <div class="table__body">
         <employee-item
           v-for="employee in filteredEmployees"
           :employee="employee"
           :key="employee.id"
-          @remove="remove(employee.id)"
+          @remove="showRemoveModal(employee)"
         />
       </div>
     </div>
+
+    <remove-modal
+      :is-visible="isRemoveModalVisible"
+      @close="toggleRemoveModal(false)"
+    >
+      <template v-slot:header>
+        <h1>Delete entry</h1>
+      </template>
+
+      <template v-slot:body>
+        <p>Do you want to delete the {{ candidateToRemove.name }}?</p>
+      </template>
+
+      <template v-slot:footer>
+        <button class="cancel" @click="toggleRemoveModal(false)">Cancel</button>
+
+        <button class="accept-red" @click="remove">Delete</button>
+      </template>
+    </remove-modal>
   </div>
 </template>
 
@@ -34,16 +54,19 @@ import Tabs from "./components/Tabs.vue";
 import EmployeeItem from "@/components/Employee.vue";
 import { Employee } from "@/types/employees";
 import { employeeTabs } from "@/config/employeeTabsConfig";
+import RemoveModal from "@/components/Modal.vue";
 
 export default defineComponent({
   name: "App",
-  components: { Tabs, EmployeeItem },
+  components: { Tabs, EmployeeItem, RemoveModal },
   setup() {
     /**
      * Data
      */
     const localEmployees: Ref<Employee[]> = ref([]);
     const currentTab: Ref<string> = ref(employeeTabs.value[0]);
+    const isRemoveModalVisible: Ref<boolean> = ref(false);
+    const candidateToRemove: Ref<Employee | null> = ref(null);
 
     /**
      * Compositions
@@ -77,25 +100,48 @@ export default defineComponent({
       localEmployees.value = data;
     };
 
-    const remove: (id: string) => void = async (id) => {
-      const candidate = await employeesManagement.removeEmployee(id);
+    const remove: () => void = async () => {
+      if (!candidateToRemove.value) return;
+
+      const candidate = await employeesManagement.removeEmployee(
+        candidateToRemove.value.id
+      );
 
       if (!candidate || !candidate.id) return;
 
       localEmployees.value = localEmployees.value.filter(
         ({ id }) => id !== candidate.id
       );
+
+      candidateToRemove.value = null;
+
+      toggleRemoveModal(false);
     };
 
     const changeTab: (tab: string) => void = (tab) => (currentTab.value = tab);
 
+    const showRemoveModal: (candidate: Employee) => void = (candidate) => {
+      candidateToRemove.value = candidate;
+
+      toggleRemoveModal(true);
+    };
+
+    const toggleRemoveModal: (status: boolean) => void = (status) => {
+      isRemoveModalVisible.value = status;
+    };
+
     return {
       employeeTabs,
 
+      isRemoveModalVisible,
+      candidateToRemove,
+
       filteredEmployees,
 
+      showRemoveModal,
       remove,
       changeTab,
+      toggleRemoveModal,
     };
   },
 });
